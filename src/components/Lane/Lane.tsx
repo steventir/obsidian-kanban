@@ -15,16 +15,19 @@ import { Items } from '../Item/Item';
 import { ItemForm } from '../Item/ItemForm';
 import { DataTypes, Item, Lane } from '../types';
 import { LaneHeader } from './LaneHeader';
+import { App } from 'obsidian';
 
 const laneAccepts = [DataTypes.Item];
 
 export interface DraggableLaneProps {
+  plugin: App;
   lane: Lane;
   laneIndex: number;
   isStatic?: boolean;
 }
 
 export const DraggableLane = Preact.memo(function DraggableLane({
+  plugin,
   isStatic,
   lane,
   laneIndex,
@@ -49,6 +52,10 @@ export const DraggableLane = Preact.memo(function DraggableLane({
   const shouldPrepend = isCompactPrepend || insertionMethod === 'prepend';
 
   useDragHandle(measureRef, dragHandleRef);
+
+  const getItems = () => {
+    return lane.children;
+  }
 
   const addItems = (items: Item[]) => {
     boardModifiers[shouldPrepend ? 'prependItems' : 'appendItems'](
@@ -144,7 +151,9 @@ export const DraggableLane = Preact.memo(function DraggableLane({
 
         {shouldPrepend && (
           <ItemForm
+            plugin={plugin}
             addItems={addItems}
+            getItems={getItems}
             hideButton={isCompactPrepend}
             isInputVisible={isItemInputVisible}
             setIsInputVisible={setIsItemInputVisible}
@@ -167,7 +176,9 @@ export const DraggableLane = Preact.memo(function DraggableLane({
 
         {!shouldPrepend && (
           <ItemForm
+            plugin={plugin}
             addItems={addItems}
+            getItems={getItems}
             isInputVisible={isItemInputVisible}
             setIsInputVisible={setIsItemInputVisible}
           />

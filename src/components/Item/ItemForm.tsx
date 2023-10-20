@@ -8,8 +8,11 @@ import { getDropAction, handlePaste } from '../Editor/helpers';
 import { MarkdownEditor, allowNewLine } from '../Editor/MarkdownEditor';
 import { c } from '../helpers';
 import { Item } from '../types';
+import { App, Notice } from 'obsidian';
 
 interface ItemFormProps {
+  plugin: App;
+  getItems: () => Item[];
   addItems: (items: Item[]) => void;
   isInputVisible: boolean;
   setIsInputVisible: Preact.StateUpdater<boolean>;
@@ -17,6 +20,8 @@ interface ItemFormProps {
 }
 
 export function ItemForm({
+  plugin,
+  getItems,
   addItems,
   isInputVisible,
   setIsInputVisible,
@@ -76,6 +81,14 @@ export function ItemForm({
     }
   };
 
+  const onRandomClick = () => {
+    const items = getItems();
+    const randomIndex =  Math.floor(Math.random() * items.length)
+    const item = items[randomIndex];
+
+    new Notice(`Random Walk: \n\n ${item.data.title}`)
+  }
+
   if (isInputVisible) {
     return (
       <div className={c('item-form')} ref={clickOutsideRef}>
@@ -103,18 +116,28 @@ export function ItemForm({
   if (hideButton) return null;
 
   return (
-    <div className={c('item-button-wrapper')}>
-      <button
-        className={c('new-item-button')}
-        onClick={() => setIsInputVisible(true)}
-        onDragOver={(e) => {
-          if (getDropAction(stateManager, e.dataTransfer)) {
-            setIsInputVisible(true);
-          }
-        }}
-      >
-        <span className={c('item-button-plus')}>+</span> {t('Add a card')}
-      </button>
+    <div>
+      <div className={c('item-button-wrapper')}>
+        <button
+          className={c('new-item-button')}
+          onClick={() => setIsInputVisible(true)}
+          onDragOver={(e) => {
+            if (getDropAction(stateManager, e.dataTransfer)) {
+              setIsInputVisible(true);
+            }
+          }}
+        >
+          <span className={c('item-button-plus')}>+</span> {t('Add a card')}
+        </button>
+      </div>
+      <div className={c('item-button-wrapper')}>
+        <button
+          className={c('new-item-button')}
+          onClick={onRandomClick}
+        >
+          <span className={c('item-button-plus')}></span> {'! Random Walk !'}
+        </button>
+      </div>
     </div>
   );
 }
